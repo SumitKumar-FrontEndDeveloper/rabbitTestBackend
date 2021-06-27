@@ -20,4 +20,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['prefix' =>'v1'], function () {
     Route::post('changeUrl', 'UrlController@changeUrl');
+    Route::get('getLongUrl', 'UrlController@getLongUrl');
+    Route::get('getUrlList', 'UrlController@getUrlList');
+    Route::post('deleteUrl', 'UrlController@deleteUrl');
+
+
 });

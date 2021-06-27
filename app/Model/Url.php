@@ -13,7 +13,6 @@ class Url extends Model
     public  $table = "urls";
     protected static $checkUrlExists = false;
     protected static $codeLength = 7;
-    protected $pdo;
 
     public function urlToShortCode($url, $expiryDate){
 
@@ -97,8 +96,6 @@ class Url extends Model
         }
     }
 
-
-
     protected function verifyUrlExists($url){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -158,11 +155,6 @@ class Url extends Model
         if(empty($urlRow)){
             throw new Exception("Short code does not appear to exist.");
         }
-
-        if($increment == true){
-            $this->incrementCounter($urlRow["id"]);
-        }
-
         return $urlRow["long_url"];
     }
 
@@ -177,14 +169,7 @@ class Url extends Model
         return (empty($result)) ? false : $result;
     }
 
-    protected function incrementCounter($id){
-        $query = "UPDATE ".self::$table." SET hits = hits + 1 WHERE id = :id";
-        $stmt = $this->pdo->prepare($query);
-        $params = array(
-            "id" => $id
-        );
-        $stmt->execute($params);
-    }
+
     public function getAllUrl() {
         try{
             $result=DB::table('urls')->where('status',1);
@@ -199,6 +184,4 @@ class Url extends Model
             return $data;
         }
     }
-
-
 }

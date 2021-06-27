@@ -39,14 +39,12 @@ class Url extends Model
         return filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED);
     }
 
-    public function getShortUrl($longURL, $customUrl, $expiryDate) {
+    public function getShortUrl($longURL, $expiryDate) {
         try{
             // Get short code of the URL
             $shortCode = $this->urlToShortCode($longURL, $expiryDate);
-            $shortURL_Prefix = 'http://www.abc.com';
-            if($customUrl){
-                $shortURL_Prefix = $customUrl;
-            }
+            $shortURL_Prefix = 'http://www.rabbit.com';
+
            //'https://localhost/'; // with URL rewrite
             $shortURL = $shortURL_Prefix."/".$shortCode;
             $data['status_code'] = 200;

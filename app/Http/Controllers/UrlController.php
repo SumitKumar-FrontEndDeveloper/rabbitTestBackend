@@ -15,7 +15,7 @@ class UrlController extends BaseController
             return $this->sendJsonResponse($sData);exit;
         } else {
             $url = new Url();
-            $sData=$url->getShortUrl($request->url, $request->customUrl, $request->expiryDate);
+            $sData=$url->getShortUrl($request->url, $request->expiryDate);
             return $this->sendJsonResponse($sData);exit;
         }
      }

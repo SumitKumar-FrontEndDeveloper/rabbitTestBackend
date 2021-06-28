@@ -61,11 +61,18 @@ class Url extends Model
     public function getLongUrl($code) {
         try{
             $urlRow = $this->getUrlFromDB($code);
-            $data['status_code'] = 200;
-            $data['long_url'] =  $urlRow->long_url;
-            $updateHits['hits']=$urlRow->hits + 1;
-            DB::table('urls')->where('id', $urlRow->id)->update($updateHits);
-            return $data;
+            if(!empty($urlRow)) {
+                $data['status_code'] = 200;
+                $data['long_url'] =  $urlRow->long_url;
+                $updateHits['hits']=$urlRow->hits + 1;
+                DB::table('urls')->where('id', $urlRow->id)->update($updateHits);
+                return $data;
+            } else {
+                $data['status_code'] = 410;
+                $data['msg'] =  'This url have beed expired.';
+                return $data;
+            }
+
         }catch(Exception $e){
             $data['status_code'] = 400;
             $data['shortURL'] = $e->getMessage();
@@ -135,6 +142,7 @@ class Url extends Model
     protected function insertUrlInDB($url, $code, $expiryDate){
         $timestamp = date("Y-m-d H:i:s");
         $expiry = date("Y-m-d H:i:s", strtotime($expiryDate));
+
         $values = array('long_url' => $url,'short_code' => $code,'expiry_date' => $expiry, 'created'=> $timestamp,'hits'=>0);
         $id=DB::table('urls')->insertGetId($values);
         return $id;
@@ -163,14 +171,15 @@ class Url extends Model
     }
 
     protected function getUrlFromDB($code){
-        $result=DB::table('urls')->select('long_url','hits','id')->where('short_code', $code)->first();
+        $todayDate = date("Y-m-d");
+        $result=DB::table('urls')->select('long_url','hits','id','expiry_date')->where('expiry_date', '>=', $todayDate)->where('short_code', $code)->where('status', 1)->first();
         return (empty($result)) ? false : $result;
     }
 
 
     public function getAllUrl() {
         try{
-            $result=DB::table('urls')->where('status',1);
+            $result=DB::table('urls')->where('status',1)->orderBy( 'hits' , 'desc' )->orderBy( 'expiry_date' , 'desc');
             $urlData=$result->paginate(5);
             $bdata['total']=$urlData->total();
             $data['status_code'] = 200;
